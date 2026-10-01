@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `DirectJsonStreamParser` no longer prefixes relative data binding paths with `/` for protocol versions after v0.9 (v0.9.1, v1.0). Template children such as `{"path": "name"}` inside a `List` stayed relative under v0.9 but were rewritten to read from the data model root.
 - Add A2UI Macros API under `a2ui.transformers.macros` (`@macro` decorator and `MacroExpander`), enabling authoring of reusable, high-level composite components using fluent Python builder classes that lower into primitive A2UI component subtrees (`transform_to_transport`) and synthesize inference catalog schemas (`transform_to_inference_catalog`, `to_catalog`) (#2519).
 
 ## 0.7.0 (2026-09-28)

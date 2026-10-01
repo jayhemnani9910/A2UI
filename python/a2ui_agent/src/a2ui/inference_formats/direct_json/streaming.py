@@ -22,7 +22,6 @@ from typing import Any, TYPE_CHECKING
 
 from a2ui.parser.constants import *
 from a2ui.schema.constants import (
-    VERSION_0_9,
     VERSION_0_8,
     A2UI_OPEN_TAG,
     A2UI_CLOSE_TAG,
@@ -1226,11 +1225,11 @@ class DirectJsonStreamParser:
             ):
                 path = obj["path"]
                 key = path.lstrip("/")
-                if self._version != VERSION_0_9:
+                if self._version == VERSION_0_8:
                     if "componentId" not in obj:
                         obj.clear()
                     obj.update({"path": "/" + key})
-            elif self._version != VERSION_0_9:
+            elif self._version == VERSION_0_8:
                 # If not in data model, still ensure path has leading slash if it's a bindable object (v0.8 only)
                 current_path = obj.get("path")
                 if current_path is not None:

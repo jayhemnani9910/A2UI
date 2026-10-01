@@ -281,3 +281,31 @@ def test_direct_json_stream_parser_leaf_child_fields(test_catalog):
     assert "child" in unmapped_fields
     assert "children" in unmapped_fields
     assert "label" not in unmapped_fields
+
+
+@pytest.mark.parametrize("version", ["0.9", "0.9.1"])
+def test_direct_json_stream_parser_keeps_relative_paths(version):
+    from a2ui.basic_catalog.provider import BasicCatalog
+    from a2ui.inference_formats.direct_json import DirectJsonStreamParser
+
+    fmt = DirectJsonFormat(version=version, catalogs=[BasicCatalog.get_config(version)])
+    catalog = fmt.get_selected_catalog()
+    wire = f"v{version}"
+    response = (
+        f'<a2ui-json>[{{"version": "{wire}", "createSurface": {{"surfaceId": "s",'
+        f' "catalogId": "{catalog.catalog_id}"}}}}, {{"version": "{wire}",'
+        ' "updateComponents": {"surfaceId": "s", "components": [{"id": "root",'
+        ' "component": "List", "children": {"path": "/items", "componentId":'
+        ' "row"}}, {"id": "row", "component": "Text", "text": {"path":'
+        ' "name"}}]}}]</a2ui-json>'
+    )
+
+    parser = DirectJsonStreamParser(catalog=catalog)
+    messages = [
+        m for part in parser.process_chunk(response) for m in part.a2ui_json or []
+    ]
+    components = [
+        c for m in messages for c in m.get("updateComponents", {}).get("components", [])
+    ]
+    row = next(c for c in components if c["id"] == "row")
+    assert row["text"] == {"path": "name"}
