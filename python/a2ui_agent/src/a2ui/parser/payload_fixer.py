@@ -30,9 +30,8 @@ def parse_and_fix(payload: str) -> list[dict[str, Any]]:
     Returns:
       A parsed and potentially fixed payload (list of dicts).
     """
-    normalized_payload = _normalize_smart_quotes(payload)
     try:
-        a2ui_json = _parse(normalized_payload)
+        a2ui_json = _parse(payload)
         return a2ui_json
     except (
         json.JSONDecodeError,
@@ -40,6 +39,7 @@ def parse_and_fix(payload: str) -> list[dict[str, Any]]:
         A2uiParseError,
     ) as e:
         logger.warning(f"Initial A2UI payload validation failed: {e}")
+        normalized_payload = _normalize_smart_quotes(payload)
         updated_payload = _remove_trailing_commas(normalized_payload)
         a2ui_json = _parse(updated_payload)
         return a2ui_json

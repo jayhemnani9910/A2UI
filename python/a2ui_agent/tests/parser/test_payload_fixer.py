@@ -55,6 +55,26 @@ class TestPayloadFixer(unittest.TestCase):
         components = res[0]['createSurface']['components']
         self.assertEqual(components[0]['text'], 'Hello world')
 
+    def test_parse_and_fix_keeps_typographic_quotes_in_valid_json(self):
+        """Verify typographic quotes inside string values of valid JSON are kept."""
+        payload = (
+            '[{"version": "v0.9", "createSurface": {"surfaceId": "default",'
+            ' "components": ['
+            '{"id": "t1", "component": "Text", "text": "Willkommen im „Café Central“"},'
+            '{"id": "t2", "component": "Text", "text": "It’s the ‘best’ in town"}'
+            ']}}]'
+        )
+        res = parse_and_fix(payload)
+        components = res[0]['createSurface']['components']
+        self.assertEqual(components[0]['text'], 'Willkommen im „Café Central“')
+        self.assertEqual(components[1]['text'], 'It’s the ‘best’ in town')
+
+    def test_parse_and_fix_recovers_smart_quote_delimiters(self):
+        """Verify smart quotes used as JSON delimiters are still repaired."""
+        payload = '[{“version”: “v0.9”, “deleteSurface”: {“surfaceId”: “main”}}]'
+        res = parse_and_fix(payload)
+        self.assertEqual(res[0]['deleteSurface']['surfaceId'], 'main')
+
     def test_parse_and_fix_recovers_unescaped_control_characters(self):
         """Verify parse_and_fix recovers payloads with unescaped control characters in strings."""
         corrupt_payload = (
