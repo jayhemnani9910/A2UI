@@ -128,6 +128,18 @@ describe('Common Basic Functions', () => {
       assert.strictEqual(executeFormatDate('invalid-date'), '');
     });
 
+    it('executeFormatDate keeps quoted literals and short weekday widths', () => {
+      const value = '2026-02-02T15:17:09Z';
+      assert.strictEqual(
+        executeFormatDate(value, "MMM d 'at' h:mm a", 'en-US'),
+        'Feb 2 at 3:17 PM',
+      );
+      assert.strictEqual(executeFormatDate(value, "h 'o''clock'", 'en-US'), "3 o'clock");
+      assert.strictEqual(executeFormatDate(value, "h''mm", 'en-US'), "3'17");
+      assert.strictEqual(executeFormatDate(value, 'EEE, MMM d', 'en-US'), 'Mon, Feb 2');
+      assert.strictEqual(executeFormatDate(value, 'EE E', 'en-US'), 'Mon Mon');
+    });
+
     it('parseTimestamp', () => {
       const parsed = parseTimestamp('2025-01-01T12:00:00+02:00');
       assert.ok(parsed);

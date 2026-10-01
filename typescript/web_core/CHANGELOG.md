@@ -1,5 +1,7 @@
 ## Unreleased
 
+- `formatDate` handles TR35 quoted literals (`'at'`, `''` for an apostrophe) and the `EE`/`EEE` weekday widths again. Since date-fns was removed, `"MMM d 'at' h:mm a"` rendered `Feb 2 'PMt' 3:17 PM` and `"EEE"` repeated the weekday name.
+
 - Universal elements accept an optional `node` (`A2uiWebComponentElement.node`): `A2uiLitElement` takes its `context` from it and passes each child its own node, and `renderA2uiNode` accepts a `ComponentNode`. `context` remains supported, so parents can move to nodes one at a time. [#2880](https://github.com/a2ui-project/a2ui/pull/2880)
 
 - Expose `ComponentNode.context`, the context the resolver bound the node with (undefined on placeholders). [#2879](https://github.com/a2ui-project/a2ui/pull/2879)

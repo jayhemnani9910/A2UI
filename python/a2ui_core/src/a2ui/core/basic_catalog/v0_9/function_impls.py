@@ -255,7 +255,9 @@ def create_format_currency_implementation(
 
 FormatCurrencyImplementation = create_format_currency_implementation(None)
 
-_DATE_TOKENS = re.compile(r"yyyy|yy|MMMM|MMM|MM|M|EEEE|E|dd|d|HH|H|hh|h|mm|ss|a|%")
+_DATE_TOKENS = re.compile(
+    r"'(?:[^']|'')*'|yyyy|yy|MMMM|MMM|MM|M|EEEE|EEE|EE|E|dd|d|HH|H|hh|h|mm|ss|a|%"
+)
 
 
 def create_format_date_implementation(
@@ -279,6 +281,8 @@ def create_format_date_implementation(
 
             def _sub(m: re.Match[str]) -> str:
                 tok = m.group(0)
+                if tok.startswith("'"):
+                    return "'" if tok == "''" else tok[1:-1].replace("''", "'")
                 if tok == "yyyy":
                     return str(dt.year)
                 if tok == "yy":
@@ -293,7 +297,7 @@ def create_format_date_implementation(
                     return str(dt.month)
                 if tok == "EEEE":
                     return str(loc.days["format"]["wide"][dt.weekday()])
-                if tok == "E":
+                if tok in ("EEE", "EE", "E"):
                     return str(loc.days["format"]["abbreviated"][dt.weekday()])
                 if tok == "dd":
                     return f"{dt.day:02d}"

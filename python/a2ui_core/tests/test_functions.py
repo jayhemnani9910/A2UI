@@ -425,6 +425,25 @@ def test_format_currency_spacing_matches_web_engine(version):
 
 
 @pytest.mark.parametrize("version", ["v0_9", "v1_0"])
+def test_format_date_keeps_quoted_literals_and_short_weekday_widths(version):
+    import importlib
+
+    module = importlib.import_module(
+        f"a2ui.core.basic_catalog.{version}.function_impls"
+    )
+    format_date = module.create_format_date_implementation("en-US")
+
+    def fmt(pattern):
+        return format_date.execute({"value": "2026-02-02T15:17:09Z", "format": pattern})
+
+    assert fmt("MMM d 'at' h:mm a") == "Feb 2 at 3:17 PM"
+    assert fmt("h 'o''clock'") == "3 o'clock"
+    assert fmt("h''mm") == "3'17"
+    assert fmt("EEE, MMM d") == "Mon, Feb 2"
+    assert fmt("EE E") == "Mon Mon"
+
+
+@pytest.mark.parametrize("version", ["v0_9", "v1_0"])
 def test_format_currency_malformed_code_follows_locale_pattern(version):
     """Pins the malformed-code layout against the web engine.
 

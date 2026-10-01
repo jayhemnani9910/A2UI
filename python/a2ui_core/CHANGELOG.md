@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `formatDate` handles TR35 quoted literals (`'at'`, `''` for an apostrophe) and the `EE`/`EEE` weekday widths, matching the web engine.
 - Execute `functionCall` and `call` component actions locally in `GenericBinder` and prevent `SurfaceModel.dispatch_action` from emitting them as agent-facing `on_action` events.
 - `ExpressionParser` accepts number literals with a leading decimal point
   (`.5`, `-.5`, `+.5`, `.5e2`), including as function-call arguments. `.foo`

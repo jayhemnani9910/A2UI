@@ -291,7 +291,8 @@ export function getDateNames(locale: string): DateNames {
   return names;
 }
 
-export const DATE_TOKENS = /yyyy|yy|MMMM|MMM|MM|M|EEEE|E|dd|d|HH|H|hh|h|mm|ss|a/g;
+export const DATE_TOKENS =
+  /'(?:[^']|'')*'|yyyy|yy|MMMM|MMM|MM|M|EEEE|EEE|EE|E|dd|d|HH|H|hh|h|mm|ss|a/g;
 export const ISO_OFFSET = /(?:Z|[+-]\d{2}:?\d{2})$/;
 
 /**
@@ -423,6 +424,9 @@ export function executeFormatDate(
   const hours12 = hours % 12 || 12;
 
   return pattern.replace(DATE_TOKENS, (token: string) => {
+    if (token.startsWith("'")) {
+      return token === "''" ? "'" : token.slice(1, -1).replace(/''/g, "'");
+    }
     switch (token) {
       case 'yyyy':
         return String(shifted.getUTCFullYear());
@@ -438,6 +442,8 @@ export function executeFormatDate(
         return String(shifted.getUTCMonth() + 1);
       case 'EEEE':
         return names.weekdaysLong[weekdayIndex];
+      case 'EEE':
+      case 'EE':
       case 'E':
         return names.weekdaysShort[weekdayIndex];
       case 'dd':
