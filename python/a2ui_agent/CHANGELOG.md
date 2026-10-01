@@ -1,5 +1,6 @@
 ## Unreleased
 
+- `DirectJsonStreamParser` no longer emits partial `updateDataModel` messages for an update that has a `path`. The partials dropped the path, so a chunked stream replaced the whole data model instead of the value at that path.
 - Add A2UI Macros API under `a2ui.transformers.macros` (`@macro` decorator and `MacroExpander`), enabling authoring of reusable, high-level composite components using fluent Python builder classes that lower into primitive A2UI component subtrees (`transform_to_transport`) and synthesize inference catalog schemas (`transform_to_inference_catalog`, `to_catalog`) (#2519).
 
 ## 0.7.0 (2026-09-28)

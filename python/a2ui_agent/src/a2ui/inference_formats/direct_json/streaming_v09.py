@@ -212,7 +212,12 @@ class DirectJsonStreamParserV09(DirectJsonStreamParser):
             if obj and isinstance(obj, dict) and msg_type in obj:
 
                 dm_obj = obj[msg_type]
-                if isinstance(dm_obj, dict) and 'value' in dm_obj:
+                # Only sniff root updates; a nested path is sent once complete.
+                if (
+                    isinstance(dm_obj, dict)
+                    and 'value' in dm_obj
+                    and dm_obj.get('path', '/') == '/'
+                ):
                     value_map = dm_obj['value']
                     if isinstance(value_map, dict):
                         # Find delta against yielded data model

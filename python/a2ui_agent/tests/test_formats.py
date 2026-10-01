@@ -281,3 +281,36 @@ def test_direct_json_stream_parser_leaf_child_fields(test_catalog):
     assert "child" in unmapped_fields
     assert "children" in unmapped_fields
     assert "label" not in unmapped_fields
+
+
+def test_direct_json_stream_parser_keeps_data_model_path_when_chunked():
+    from a2ui.basic_catalog.provider import BasicCatalog
+    from a2ui.inference_formats.direct_json import DirectJsonStreamParser
+
+    fmt = DirectJsonFormat(version="0.9.1", catalogs=[BasicCatalog.get_config("0.9.1")])
+    catalog = fmt.get_selected_catalog()
+    response = (
+        '<a2ui-json>[{"version": "v0.9.1", "createSurface": {"surfaceId": "s",'
+        f' "catalogId": "{catalog.catalog_id}"}}}}, {{"version": "v0.9.1",'
+        ' "updateDataModel": {"surfaceId": "s", "path": "/cart", "value":'
+        ' {"total": "$12"}}}, {"version": "v0.9.1", "updateDataModel":'
+        ' {"surfaceId": "s", "path": "/user", "value": {"name": "Ada", "city":'
+        ' "London"}}}]</a2ui-json>'
+    )
+
+    parser = DirectJsonStreamParser(catalog=catalog)
+    messages = [
+        m
+        for i in range(0, len(response), 5)
+        for part in parser.process_chunk(response[i : i + 5])
+        for m in part.a2ui_json or []
+    ]
+    updates = [m["updateDataModel"] for m in messages if "updateDataModel" in m]
+    assert updates == [
+        {"surfaceId": "s", "path": "/cart", "value": {"total": "$12"}},
+        {
+            "surfaceId": "s",
+            "path": "/user",
+            "value": {"name": "Ada", "city": "London"},
+        },
+    ]
